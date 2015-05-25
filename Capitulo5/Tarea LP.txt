@@ -165,37 +165,40 @@ C++ tampoco reconoce variables creadas dentro de un for una vez se esta fuera de
 #include <time.h>
 using namespace std;
 
-int static_[3] = {1,2,3};
+void static_call(){
+	static int static_[3] = {1,2,3};
+}
 
-int vector_sum(int* vec, int tam){
-    int result = 0;
-    for(int i=0; i<tam; i++)
-        result += vec[i];
-    return result;
+void stack_call(){
+	int stack_[3];
+	stack_[0] = 1; stack_[1] = 2; stack_[2] = 3;
+}
+
+void heap_call(){
+	int* heap_ = new int[3];
+    heap_[0] = 1; heap_[1] = 2; heap_[2] = 3;
 }
 
 int main()
 {
-    int stack_[3];
-    stack_[0] = 1; stack_[1] = 2; stack_[2] = 3;
-
-    int* heap_ = new int[3];
-    heap_[0] = 1; heap_[1] = 2; heap_[2] = 3;
+	int it = 100000000;
     clock_t start = clock();
-    cout << "Static: " << vector_sum(static_, 3) << endl;
+    for(int i=0; i<it; i++)
+    	static_call();
     printf("Tiempo transcurrido en Static: %f \n", ((double)clock() - start) / CLOCKS_PER_SEC);
 
     start = clock();
-    cout << "Stack: " << vector_sum(stack_, 3) << endl;
+    for(int i=0; i<it; i++)
+    	stack_call();
     printf("Tiempo transcurrido en Stack: %f \n", ((double)clock() - start) / CLOCKS_PER_SEC);
 
     start = clock();
-    cout << "Heap: " << vector_sum(heap_, 3) << endl;
+    for(int i=0; i<it; i++)
+    	heap_call();
     printf("Tiempo transcurrido en Heap: %f", ((double)clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }
-output:
-Tiempo transcurrido en Static: 0.010000
-Tiempo transcurrido en Stack: 0.011000
-Tiempo transcurrido en Heap: 0.010000
+Tiempo transcurrido en Static: 0.000000 
+Tiempo transcurrido en Stack: 0.000000 
+Tiempo transcurrido en Heap: 0.830000
