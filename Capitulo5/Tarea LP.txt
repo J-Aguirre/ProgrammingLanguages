@@ -1,0 +1,123 @@
+1.
+
+$a = 0;
+sub foo {
+	return $a;
+}
+sub staticScope {
+ 	my $a = 1; # lexical (static)
+	return foo();
+}
+ 
+print staticScope();
+ 
+$b = 0;
+sub bar {
+  	return $b;
+}
+sub dynamicScope {
+  	local $b = 1;
+  	return bar();
+}
+print dynamicScope();
+
+Lo que define a una variable estatica y dinamica son las palabras MY y LOCAL las cuales definen el alcance de las variables entre las funciones, el output es 0 y 1 respectivamente
+por lo que el MY solo se toma dentro de la funcion staticScope, mientras que la variable con LOCAL cambia cuando lo hace la variable incluso fuera de la funcion. 
+
+2.
+
+	(set 'regular 5);setq would make it special in CMUCL!
+	5 
+	> (defun check-regular () regular)
+	CHECK-REGULAR 
+	> (check-regular)
+	5 
+	> (let ((regular 6)) (check-regular))
+	5
+
+	> (defvar *special* 5)
+	*SPECIAL*
+	> (defun check-special () *special*)
+	CHECK-SPECIAL
+	> (check-special)
+	5
+	> (let ((*special* 6)) (check-special))
+	6
+
+En LISP los comandos 'regular y *special* son las que determinan si la variable es estatica o dinamica
+
+4.
+
+def fun3(num1):
+	num1 = num1 + 1
+	a = num1
+	print "from fun3  num1 = ", num1
+	print "from fun3  a =", a
+	return num1
+
+def fun2(num1):
+	# print "from fun2  a =", a
+	a = fun3(num1)
+	print "form fun2 num1 = ", num1
+	print "from fun2 second time  a =", a
+	return num1
+	
+def fun1(num1):
+	# print "from fun1  a =", a
+	a = fun2(num1)
+	print "form fun1 num1 = ", num1
+	print "from fun1 second time  a =", a
+	
+num1 = 1
+fun1(num1)
+
+
+La variable num1 es solamente actualizada en la ultima funcion, pero en las funciones anteriores (las que anidan a fun3) num1 sigue siendo el mismo, 
+a menos que se le actualice una vez llamada la funcion, num1 = funN(num1) en este caso num1 si es actualizada y esto es porque Python utiliza referencias por defecto y no obtiene copias
+
+5. 
+	C: 	"error: 'x' undeclared" El valor X en la primera linea no es reconocido como variable y la determina como indefinida regresando asi un error al momento de compilar 
+	C++: 	"error: 'x' was not declared in this scope" El valor X en la primera linea no es reconocido como variable y la determina como indefinida regresando asi un error al momento de compilar 
+	Java: 	"cannot find symbol" El valor X en la primera linea no es reconocido por no haber sido declarada antes con un tipo (int, char, etc) por lo cual me retorna error al trtar de usar una variable que no es definida
+
+7.
+
+#include <iostream>
+#include <stdio.h>
+#include <time.h>
+using namespace std;
+
+int static_[3] = {1,2,3};
+
+int vector_sum(int* vec, int tam){
+    int result = 0;
+    for(int i=0; i<tam; i++)
+        result += vec[i];
+    return result;
+}
+
+int main()
+{
+    int stack_[3];
+    stack_[0] = 1; stack_[1] = 2; stack_[2] = 3;
+
+    int* heap_ = new int[3];
+    heap_[0] = 1; heap_[1] = 2; heap_[2] = 3;
+    clock_t start = clock();
+    cout << "Static: " << vector_sum(static_, 3) << endl;
+    printf("Tiempo transcurrido en Static: %f \n", ((double)clock() - start) / CLOCKS_PER_SEC);
+
+    start = clock();
+    cout << "Stack: " << vector_sum(stack_, 3) << endl;
+    printf("Tiempo transcurrido en Stack: %f \n", ((double)clock() - start) / CLOCKS_PER_SEC);
+
+    start = clock();
+    cout << "Heap: " << vector_sum(heap_, 3) << endl;
+    printf("Tiempo transcurrido en Heap: %f", ((double)clock() - start) / CLOCKS_PER_SEC);
+
+    return 0;
+}
+output:
+Tiempo transcurrido en Static: 0.010000
+Tiempo transcurrido en Stack: 0.011000
+Tiempo transcurrido en Heap: 0.010000
