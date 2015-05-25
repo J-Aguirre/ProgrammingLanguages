@@ -46,6 +46,42 @@ por lo que el MY solo se toma dentro de la funcion staticScope, mientras que la 
 
 En LISP los comandos 'regular y *special* son las que determinan si la variable es estatica o dinamica
 
+3.
+
+function fun3(num1){
+	var num1 = num1 + 1;
+	var a = num1;
+	console.log("from fun3  num1 = ", num1);
+	console.log("from fun3  a =", a);
+	return num1;
+}
+
+function fun2(num1){
+    console.log("from fun2  a =", a);
+	var a = fun3(num1);
+	console.log("form fun2 num1 = ", num1);
+	console.log("from fun2 second time  a =", a);
+	return num1;
+}
+
+function fun1(num1){
+	console.log("from fun1  a =", a);
+	var a = fun2(num1);
+	console.log("form fun1 num1 = ", num1);
+	console.log("from fun1 second time  a =", a);
+}
+
+var num1 = 1;
+fun1(num1);
+VM261:19 from fun1  a = undefined
+VM261:11 from fun2  a = undefined
+VM261:5 from fun3  num1 =  2
+VM261:6 from fun3  a = 2
+VM261:13 form fun2 num1 =  1
+VM261:14 from fun2 second time  a = 2
+VM261:21 form fun1 num1 =  1
+VM261:22 from fun1 second time  a = 1
+
 4.
 
 def fun3(num1):
