@@ -5,7 +5,7 @@ sub foo {
 	return $a;
 }
 sub staticScope {
- 	my $a = 1; # lexical (static)
+ 	my $a = 1;
 	return foo();
 }
  
@@ -46,6 +46,42 @@ por lo que el MY solo se toma dentro de la funcion staticScope, mientras que la 
 
 En LISP los comandos 'regular y *special* son las que determinan si la variable es estatica o dinamica
 
+3.
+
+function fun3(num1){
+	var num1 = num1 + 1;
+	var a = num1;
+	console.log("from fun3  num1 = ", num1);
+	console.log("from fun3  a =", a);
+	return num1;
+}
+
+function fun2(num1){
+    console.log("from fun2  a =", a);
+	var a = fun3(num1);
+	console.log("form fun2 num1 = ", num1);
+	console.log("from fun2 second time  a =", a);
+	return num1;
+}
+
+function fun1(num1){
+	console.log("from fun1  a =", a);
+	var a = fun2(num1);
+	console.log("form fun1 num1 = ", num1);
+	console.log("from fun1 second time  a =", a);
+}
+
+var num1 = 1;
+fun1(num1);
+VM261:19 from fun1  a = undefined
+VM261:11 from fun2  a = undefined
+VM261:5 from fun3  num1 =  2
+VM261:6 from fun3  a = 2
+VM261:13 form fun2 num1 =  1
+VM261:14 from fun2 second time  a = 2
+VM261:21 form fun1 num1 =  1
+VM261:22 from fun1 second time  a = 1
+
 4.
 
 def fun3(num1):
@@ -80,6 +116,48 @@ a menos que se le actualice una vez llamada la funcion, num1 = funN(num1) en est
 	C++: 	"error: 'x' was not declared in this scope" El valor X en la primera linea no es reconocido como variable y la determina como indefinida regresando asi un error al momento de compilar 
 	Java: 	"cannot find symbol" El valor X en la primera linea no es reconocido por no haber sido declarada antes con un tipo (int, char, etc) por lo cual me retorna error al trtar de usar una variable que no es definida
 
+6.
+
+JAVA
+class Ideone
+{
+	public static void main (String[] args) throws java.lang.Exception
+	{
+		for(int i=0; i<2; i++){
+			int a = 1;
+		}
+		int a = 0;
+		System.out.print(a);
+	}
+}
+Java simplemente no reconoce la variable fuera del for si a esta se le llama.
+
+C#
+public class Test
+{
+	public static void Main()
+	{
+		for (int i=0; i<2; i++) { 
+			int a = 1;
+		}
+		int a = 0;
+		MessageBox.Show(a); 
+	}
+}
+C# retorna un error en cuanto a la variable: error CS0136: A local variable named `a' cannot be declared in this scope because it would give a different meaning to `a', which is already used in a `child' scope to denote something else
+Compilation failed: 1 error(s).
+
+C++
+int main() {
+	for(int i=0; i<2; i++)
+		int a = 1;
+	int a = 0;
+	cout << a << endl;
+	return 0;
+}
+C++ tampoco reconoce variables creadas dentro de un for una vez se esta fuera de el.
+	
+	
 7.
 
 #include <iostream>
@@ -87,37 +165,40 @@ a menos que se le actualice una vez llamada la funcion, num1 = funN(num1) en est
 #include <time.h>
 using namespace std;
 
-int static_[3] = {1,2,3};
+void static_call(){
+	static int static_[3] = {1,2,3};
+}
 
-int vector_sum(int* vec, int tam){
-    int result = 0;
-    for(int i=0; i<tam; i++)
-        result += vec[i];
-    return result;
+void stack_call(){
+	int stack_[3];
+	stack_[0] = 1; stack_[1] = 2; stack_[2] = 3;
+}
+
+void heap_call(){
+	int* heap_ = new int[3];
+    heap_[0] = 1; heap_[1] = 2; heap_[2] = 3;
 }
 
 int main()
 {
-    int stack_[3];
-    stack_[0] = 1; stack_[1] = 2; stack_[2] = 3;
-
-    int* heap_ = new int[3];
-    heap_[0] = 1; heap_[1] = 2; heap_[2] = 3;
+	int it = 100000000;
     clock_t start = clock();
-    cout << "Static: " << vector_sum(static_, 3) << endl;
+    for(int i=0; i<it; i++)
+    	static_call();
     printf("Tiempo transcurrido en Static: %f \n", ((double)clock() - start) / CLOCKS_PER_SEC);
 
     start = clock();
-    cout << "Stack: " << vector_sum(stack_, 3) << endl;
+    for(int i=0; i<it; i++)
+    	stack_call();
     printf("Tiempo transcurrido en Stack: %f \n", ((double)clock() - start) / CLOCKS_PER_SEC);
 
     start = clock();
-    cout << "Heap: " << vector_sum(heap_, 3) << endl;
+    for(int i=0; i<it; i++)
+    	heap_call();
     printf("Tiempo transcurrido en Heap: %f", ((double)clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }
-output:
-Tiempo transcurrido en Static: 0.010000
-Tiempo transcurrido en Stack: 0.011000
-Tiempo transcurrido en Heap: 0.010000
+Tiempo transcurrido en Static: 0.000000 
+Tiempo transcurrido en Stack: 0.000000 
+Tiempo transcurrido en Heap: 0.830000
